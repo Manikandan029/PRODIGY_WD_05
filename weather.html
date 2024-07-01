@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Application</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgba(6,68,160,1);
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            background-color: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .search {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            width: 200px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(63, 63, 237);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: rgba(22, 22, 228);
+        }
+
+        .weather {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather Application</h1>
+        <div class="search">
+            <input type="text" id="cityInput" placeholder="Enter city name">
+            <button id="searchButton">Search</button>
+        </div>
+        <div class="weather" id="weather">
+            <h2 id="cityName"></h2>
+            <p id="temperature"></p>
+            <p id="description"></p>
+            <p id="humidity"></p>
+            <p id="wind"></p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const apiKey = 'f62b2737ff56477aad760105241606'; 
+            const searchButton = document.getElementById('searchButton');
+            const cityInput = document.getElementById('cityInput');
+            const weather = document.getElementById('weather');
+            const cityName = document.getElementById('cityName');
+            const temperature = document.getElementById('temperature');
+            const description = document.getElementById('description');
+            const humidity = document.getElementById('humidity');
+            const wind = document.getElementById('wind');
+
+            searchButton.addEventListener('click', () => {
+                const city = cityInput.value.trim();
+                if (city) {
+                    getWeather(city);
+                } else {
+                    alert('Please enter a city name');
+                }
+            });
+
+            async function getWeather(city) {
+                const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`;
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Weather data not available');
+                    }
+                    const data = await response.json();
+                    console.log('Weather data:', data);
+
+                    if (data.error) {
+                        alert('City not found or weather data unavailable');
+                    } else {
+                        cityName.textContent = data.location.name + ', ' + data.location.country;
+                        temperature.textContent = `Temperature: ${data.current.temp_c} °C`;
+                        description.textContent = `Weather: ${data.current.condition.text}`;
+                        humidity.textContent = `Humidity: ${data.current.humidity} %`;
+                        wind.textContent = `Wind Speed: ${data.current.wind_kph} km/h`;
+                        weather.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Error fetching weather data:', error);
+                    alert('An error occurred while fetching the weather data.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
